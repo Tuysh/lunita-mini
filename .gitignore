@@ -1,0 +1,14 @@
+# Python bytecode files
+__pycache__/
+
+# Momentaneamente ignorar archivos de documentación interna
+doc/
+
+# Entorno virtual
+venv/
+
+# Variables de entorno
+.env
+
+# Archivos de test para probar a Lunita Mini
+ejemplo_test.py
