@@ -1,6 +1,7 @@
+from groq.types.chat import ChatCompletionMessageParam
+
 from .cliente import nuevo_cliente
 from .configuracion import ConfigurarEstrellas
-from groq.types.chat import ChatCompletionMessageParam
 
 
 class Sesion:
