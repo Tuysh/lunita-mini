@@ -6,7 +6,9 @@ from groq.types.chat import ChatCompletionMessageParam
 class Sesion:
     def __init__(self, configuracion: ConfigurarEstrellas):
         self._configuracion = configuracion
-        self._historial: list[ChatCompletionMessageParam] = []
+        self._historial: list[ChatCompletionMessageParam] = (
+            self._configuracion.historial
+        )
         self._cliente = nuevo_cliente(self._configuracion.token)
 
     def predecir(self, entrada: str) -> str | None:
