@@ -2,14 +2,13 @@ from groq.types.chat import ChatCompletionMessageParam
 
 from .cliente import nuevo_cliente
 from .configuracion import ConfigurarEstrellas
+from .historial import Historial
 
 
 class Sesion:
     def __init__(self, configuracion: ConfigurarEstrellas):
         self._configuracion = configuracion
-        self._historial: list[ChatCompletionMessageParam] = (
-            self._configuracion.historial
-        )
+        self._historial: Historial = Historial()
         self._cliente = nuevo_cliente(self._configuracion.token)
 
     def predecir(self, entrada: str) -> str | None:
@@ -21,7 +20,7 @@ class Sesion:
                         "role": "system",
                         "content": self._configuracion.prompt(),
                     },
-                    *self._historial,
+                    *self._historial.historial,
                     {"role": "user", "content": entrada.strip()},
                 ],
                 temperature=self._configuracion.temperatura,
@@ -29,8 +28,10 @@ class Sesion:
 
             prediccion = respuesta.choices[0].message.content
 
-            self._historial.append({"role": "user", "content": entrada})
-            self._historial.append({"role": "assistant", "content": prediccion})
+            self._historial.agregar_mensaje(
+                {"role": "user", "content": entrada},
+                {"role": "assistant", "content": prediccion},
+            )
 
             return prediccion
         except Exception as e:
@@ -38,8 +39,4 @@ class Sesion:
 
     @property
     def historial(self) -> list[ChatCompletionMessageParam]:
-        return self._historial
-
-    @historial.setter
-    def historial(self, valor: list[ChatCompletionMessageParam]):
-        self._historial = valor
+        return self._historial.historial
