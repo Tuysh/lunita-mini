@@ -1,11 +1,20 @@
+from typing import Optional
+
 from groq.types.chat import ChatCompletionMessageParam
 
 
 class Historial:
     def __init__(
-        self, mensajes: list[ChatCompletionMessageParam] = [], max_mensajes: int = 20
+        self,
+        mensajes: Optional[list[ChatCompletionMessageParam]] = None,
+        max_mensajes: int = 20,
     ):
-        self._mensajes: list[ChatCompletionMessageParam] = mensajes
+        if mensajes is None:
+            mensajes = []
+
+        self._mensajes: list[ChatCompletionMessageParam] = (
+            mensajes[-max_mensajes:] if len(mensajes) > max_mensajes else mensajes
+        )
         self._max_mensajes = max_mensajes
 
     @property

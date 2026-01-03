@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from groq.types.chat import ChatCompletionMessageParam
 
@@ -10,11 +10,11 @@ class ConfigurarEstrellas:
         self,
         token: str,
         modo: Literal["normal", "avanzado"] = "normal",
-        historial: list[ChatCompletionMessageParam] = [],
+        historial: Optional[list[ChatCompletionMessageParam]] = None,
     ):
         self.token = token
         self._temperatura = 1.1
-        self._historial = historial
+        self._historial = historial.copy() if historial is not None else []
 
         self._modelo = (
             "openai/gpt-oss-120b" if modo == "avanzado" else "openai/gpt-oss-20b"
