@@ -17,6 +17,9 @@ classifiers = [
 ]
 dependencies = ["groq>=1.0.0"]
 
+[dependency-groups]
+test = ["pytest >= 9.0.2"]
+
 [project.urls]
 "Homepage" = "https://github.com/Tuysh/lunita-mini/"
 
