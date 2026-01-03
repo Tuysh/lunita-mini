@@ -52,7 +52,7 @@ class SesionAsincrona:
 
     def __init__(self, configuracion: ConfigurarEstrellas):
         self._configuracion = configuracion
-        self._historial: Historial = Historial()
+        self._historial: Historial = Historial(mensajes=configuracion.historial)
         self._cliente = nuevo_cliente_asincrono(self._configuracion.token)
 
     async def predecir(self, entrada: str) -> str | None:
