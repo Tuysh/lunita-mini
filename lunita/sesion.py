@@ -22,7 +22,7 @@ class Sesion:
                         "content": self._configuracion.prompt(),
                     },
                     *self._historial,
-                    {"role": "user", "content": entrada},
+                    {"role": "user", "content": entrada.strip()},
                 ],
                 temperature=self._configuracion.temperatura,
             )
