@@ -9,6 +9,7 @@ from groq.types.chat import ChatCompletionMessageParam
 from .cliente import nuevo_cliente
 from .configuracion import ConfigurarEstrellas
 from .historial import Historial
+from .utils import APIStatusError, ErroresMagicos
 
 
 class Sesion:
@@ -79,8 +80,12 @@ class Sesion:
             )
 
             return prediccion
+        except APIStatusError as http_err:
+            raise ErroresMagicos(http_err) from http_err
         except Exception as e:
-            raise RuntimeError(f"Error al obtener predicción: {e}") from e
+            raise RuntimeError(
+                f"!Error desconocido¡ Ni lunita puede adivinar que fue: {e}"
+            ) from e
 
     @property
     def historial(self) -> list[ChatCompletionMessageParam]:

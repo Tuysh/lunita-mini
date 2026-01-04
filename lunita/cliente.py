@@ -4,7 +4,9 @@ Este módulo crea las conexiones necesarias para comunicarse con la API
 de Groq, tanto de forma normal como asincrónica.
 """
 
-from groq import AsyncGroq, Groq
+from groq import APIStatusError, AsyncGroq, Groq
+
+from .utils import ErroresMagicos
 
 
 def nuevo_cliente(token: str) -> Groq:
@@ -16,7 +18,14 @@ def nuevo_cliente(token: str) -> Groq:
     Returns:
         Cliente configurado y listo para usar.
     """
-    return Groq(api_key=token)
+    try:
+        return Groq(api_key=token)
+    except APIStatusError as http_err:
+        raise ErroresMagicos(http_err) from http_err
+    except Exception as err:
+        raise RuntimeError(
+            f"!Error desconocido¡ Ni lunita puede adivinar que fue: {err}"
+        ) from err
 
 
 def nuevo_cliente_asincrono(token: str) -> AsyncGroq:
@@ -28,4 +37,11 @@ def nuevo_cliente_asincrono(token: str) -> AsyncGroq:
     Returns:
         Cliente asincrónico configurado y listo para usar.
     """
-    return AsyncGroq(api_key=token)
+    try:
+        return AsyncGroq(api_key=token)
+    except APIStatusError as http_err:
+        raise ErroresMagicos(http_err) from http_err
+    except Exception as err:
+        raise RuntimeError(
+            f"!Error desconocido¡ Ni lunita puede adivinar que fue: {err}"
+        ) from err
