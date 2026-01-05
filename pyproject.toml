@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lunita-mini"
-version = "0.1.0"
-description = "¡Versión básica de Lunita!"
+version = "0.1.1"
+description = "¡Versión mini de Lunita!"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "tuysh", email = "angelmacloviomorales@gmail.com" }]
 classifiers = [
