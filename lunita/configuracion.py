@@ -45,6 +45,7 @@ class ConfigurarEstrellas:
         token: Tu clave de API de Groq para poder usar Lunita.
         modo: "normal" para respuestas rápidas, "avanzado" para respuestas más elaboradas.
         historial: Lista de mensajes previos si quieres continuar una conversación.
+        instrucciones_adicionales: Texto extra para personalizar la personalidad de Lunita.
     """
 
     def __init__(
@@ -52,10 +53,12 @@ class ConfigurarEstrellas:
         token: str,
         modo: Literal["normal", "avanzado"] = "normal",
         historial: Optional[list[ChatCompletionMessageParam]] = None,
+        instrucciones_adicionales: Optional[str] = None,
     ):
         self.token = token
         self._temperatura = 1.1
         self._historial = historial.copy() if historial is not None else []
+        self._instrucciones = instrucciones_adicionales
 
         self._modelo = (
             "openai/gpt-oss-120b" if modo == "avanzado" else "openai/gpt-oss-20b"
@@ -94,4 +97,12 @@ class ConfigurarEstrellas:
         Returns:
             Texto con las instrucciones del sistema para Lunita.
         """
-        return PROMPT_LUNITA
+        extra = (
+            f"\nINSTRUCCIONES ADICIONALES\n{self._instrucciones}"
+            if self._instrucciones
+            else ""
+        )
+
+        prompt_final = f"{PROMPT_LUNITA}{extra}"
+
+        return prompt_final
