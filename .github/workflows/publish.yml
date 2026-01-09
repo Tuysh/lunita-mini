@@ -1,0 +1,77 @@
+name: CI/CD - Pruebas y Publicación en PyPI
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Ejecutar Pruebas
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configurar Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install .[test] # Instala el paquete y dependencias de test
+
+    - name: Ejecutar Pytest
+      run: |
+        pytest
+
+  publish:
+    name: Publicar en PyPI
+    needs: test
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Verificar versión diferente
+      id: check_version
+      run: |
+        # Extraer versión del pyproject.toml
+        VERSION=$(grep -m 1 'version =' pyproject.toml | cut -d '"' -f 2)
+        PACKAGE_NAME="lunita-mini"
+
+        # Consultar la última versión en PyPI
+        LATEST_PYPI=$(curl -s https://pypi.org/pypi/$PACKAGE_NAME/json | jq -r '.info.version' || echo "0.0.0")
+
+        if [ "$VERSION" == "$LATEST_PYPI" ]; then
+          echo "Error: La versión $VERSION ya existe en PyPI. Actualiza pyproject.toml."
+          exit 1
+        fi
+        echo "Versión $VERSION es nueva. Procediendo..."
+
+    - name: Instalar herramientas de construcción
+      run: |
+        pip install build
+
+    - name: Construir paquete
+      run: |
+        python -m build
+
+    - name: Publicar en PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
