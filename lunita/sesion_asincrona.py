@@ -4,6 +4,8 @@ Este módulo permite crear conversaciones con Lunita sin bloquear tu programa,
 ideal para aplicaciones web o cuando necesitas hacer varias cosas a la vez.
 """
 
+from collections.abc import AsyncGenerator
+
 from groq.types.chat import ChatCompletionMessageParam
 
 from .cliente import nuevo_cliente_asincrono
@@ -56,24 +58,24 @@ class SesionAsincrona:
         self._historial: Historial = Historial(mensajes=configuracion.historial)
         self._cliente = nuevo_cliente_asincrono(self._configuracion.token)
 
-    async def predecir(self, entrada: str) -> str | None:
+    async def predecir_en_vivo(self, entrada: str) -> AsyncGenerator[str, None]:
         """Envía un mensaje a Lunita y espera su respuesta de forma asincrónica.
 
         Args:
             entrada: El mensaje que quieres enviarle a Lunita.
 
         Returns:
-            La respuesta de Lunita como texto, o None si algo salió mal.
+            Generador asincrónico que yield fragmentos de la respuesta de Lunita como texto.
 
         Raises:
             RuntimeError: Si hubo un problema al conectarse o recibir la respuesta.
 
         Examples:
-            >>> respuesta = await sesion.predecir("Dame un consejo")
-            >>> print(respuesta)
+            >>> async for fragmento in sesion.predecir_en_vivo("Dame un consejo"):
+            ...     print(fragmento, end="")
         """
         try:
-            respuesta = await self._cliente.chat.completions.create(
+            stream = await self._cliente.chat.completions.create(
                 model=self._configuracion.modelo,
                 messages=[
                     {
@@ -84,16 +86,23 @@ class SesionAsincrona:
                     {"role": "user", "content": entrada.strip()},
                 ],
                 temperature=self._configuracion.temperatura,
+                stream=True,
             )
 
-            prediccion = respuesta.choices[0].message.content
+            respuesta_completa = ""
+
+            async for fragmento in stream:
+                contenido = fragmento.choices[0].delta.content or ""
+
+                if contenido:
+                    respuesta_completa += contenido
+                    yield contenido
 
             self._historial.agregar_mensaje(
                 {"role": "user", "content": entrada},
-                {"role": "assistant", "content": prediccion},
+                {"role": "assistant", "content": respuesta_completa},
             )
 
-            return prediccion
         except APIStatusError as http_err:
             raise ErroresMagicos(http_err) from http_err
         except Exception as e:
