@@ -39,17 +39,18 @@ class Sesion(SesionBase):
         super().__init__(configuracion)
         self._cliente = nuevo_cliente(self._configuracion.token)
 
-    def predecir(self, entrada: str) -> str | None:
+    def predecir(self, entrada: str) -> str:
         """Envía un mensaje a Lunita y espera su respuesta.
 
         Args:
             entrada: El mensaje que quieres enviarle a Lunita.
 
         Returns:
-            La respuesta de Lunita como texto, o None si algo salió mal.
+            La respuesta de Lunita como texto.
 
         Raises:
-            RuntimeError: Si hubo un problema al conectarse o recibir la respuesta.
+            ErroresMagicos: Si hay problemas con la API (token inválido, límites, etc.).
+            RuntimeError: Si ocurre un error inesperado.
 
         Examples:
             >>> respuesta = sesion.predecir("Necesito un consejo")
@@ -70,6 +71,9 @@ class Sesion(SesionBase):
             )
 
             prediccion = respuesta.choices[0].message.content
+
+            if prediccion is None:
+                raise RuntimeError("Lunita no pudo generar una respuesta válida")
 
             self._historial.agregar_mensaje(
                 {"role": "user", "content": entrada},

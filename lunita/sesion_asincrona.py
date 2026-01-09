@@ -56,16 +56,20 @@ class SesionAsincrona(SesionBase):
         self._cliente = nuevo_cliente_asincrono(self._configuracion.token)
 
     async def predecir(self, entrada: str) -> AsyncGenerator[str, None]:
-        """Envía un mensaje a Lunita y espera su respuesta de forma asincrónica.
+        """Envía un mensaje a Lunita y recibe su respuesta por fragmentos.
+
+        La respuesta llega poco a poco, como cuando alguien escribe en tiempo real.
+        Útil para mostrar el texto mientras se genera.
 
         Args:
             entrada: El mensaje que quieres enviarle a Lunita.
 
-        Returns:
-            Generador asincrónico que yield fragmentos de la respuesta de Lunita como texto.
+        Yields:
+            Fragmentos de texto de la respuesta de Lunita.
 
         Raises:
-            RuntimeError: Si hubo un problema al conectarse o recibir la respuesta.
+            ErroresMagicos: Si hay problemas con la API (token inválido, límites, etc.).
+            RuntimeError: Si ocurre un error inesperado.
 
         Examples:
             >>> async for fragmento in sesion.predecir("Dame un consejo"):
