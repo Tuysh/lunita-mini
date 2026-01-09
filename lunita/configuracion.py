@@ -1,10 +1,10 @@
 """Configuración de las conversaciones con Lunita.
 
 Este módulo maneja todos los ajustes necesarios para hablar con Lunita,
-como el token de acceso, el modo de inteligencia y el historial previo.
+como el token de acceso, el modelo y el historial previo.
 """
 
-from typing import Literal, Optional
+from typing import Optional
 
 from groq.types.chat import ChatCompletionMessageParam
 
@@ -15,7 +15,7 @@ class ConfigurarEstrellas:
     """Ajustes para personalizar tu conversación con Lunita.
 
     Esta clase guarda toda la información necesaria para crear una sesión
-    con Lunita, como tu token de acceso y qué tan inteligente quieres que sea.
+    con Lunita, como tu token de acceso y qué modelo de IA usar.
 
     Examples:
         Configuración básica:
@@ -23,11 +23,11 @@ class ConfigurarEstrellas:
         >>> from lunita import ConfigurarEstrellas
         >>> config = ConfigurarEstrellas(token="tu-token-de-groq")
 
-        Configuración en modo avanzado (más inteligente):
+        Configuración con un modelo específico:
 
         >>> config = ConfigurarEstrellas(
         ...     token="tu-token-de-groq",
-        ...     modo="avanzado"
+        ...     modelo="openai/gpt-oss-20b"
         ... )
 
         Continuar una conversación previa:
@@ -43,28 +43,37 @@ class ConfigurarEstrellas:
 
     Args:
         token: Tu clave de API de Groq para poder usar Lunita.
-        modo: "normal" para respuestas rápidas, "avanzado" para respuestas más elaboradas.
+        modelo: Nombre del modelo de Groq a usar (default: "openai/gpt-oss-120b").
         historial: Lista de mensajes previos si quieres continuar una conversación.
         instrucciones_adicionales: Texto extra para personalizar la personalidad de Lunita.
+        max_mensajes: Número máximo de mensajes a guardar en el historial.
+        temperatura: Nivel de creatividad de las respuestas (default 1.1).
     """
 
     def __init__(
         self,
         token: str,
-        modo: Literal["normal", "avanzado"] = "normal",
+        modelo: str = "openai/gpt-oss-120b",
         historial: Optional[list[ChatCompletionMessageParam]] = None,
         instrucciones_adicionales: Optional[str] = None,
         max_mensajes: int = 15,
         temperatura: float = 1.1,
     ):
+        if not token or not token.strip():
+            raise ValueError("El token no puede estar vacío.")
+
         self.token = token
         self._temperatura = temperatura
         self._historial = historial.copy() if historial is not None else []
         self._instrucciones = instrucciones_adicionales
         self._max_mensajes = max_mensajes
+        self._modelo = modelo
 
-        self._modelo = (
-            "openai/gpt-oss-120b" if modo == "avanzado" else "openai/gpt-oss-20b"
+    def __repr__(self) -> str:
+        return (
+            f"ConfigurarEstrellas(modelo='{self._modelo}', "
+            f"temperatura={self._temperatura}, "
+            f"mensajes_historial={len(self._historial)})"
         )
 
     @property
@@ -81,7 +90,7 @@ class ConfigurarEstrellas:
         """Obtiene el nombre del modelo de IA que se está usando.
 
         Returns:
-            Nombre del modelo (depende del modo elegido).
+            Nombre del modelo.
         """
         return self._modelo
 

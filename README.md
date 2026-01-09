@@ -44,15 +44,20 @@ from lunita import ConfigurarEstrellas
 # Configuración básica
 config = ConfigurarEstrellas(
     token="tu-groq-api-token",  # Requerido
-    modo="normal",              # "normal" (rápido) o "avanzado" (elaborado)
 )
 
-# Configuración avanzada
+# Configuración completa
 config = ConfigurarEstrellas(
     token="tu-groq-api-token",
-    modo="avanzado",
-    instrucciones_adicionales="Sé más optimista que nunca",  # Personalización
-    historial=[],               # Continuar conversaciones previas
+    # Control total del modelo
+    modelo="openai/gpt-oss-20b",  # Default: "openai/gpt-oss-120b"
+    # Personalización del comportamiento
+    instrucciones_adicionales="Habla siempre en rima",
+    # Ajustes técnicos
+    max_mensajes=20,            # Límite de memoria de conversación (default 15)
+    temperatura=1.2,            # Creatividad: 0.0 a 2.0 (default 1.1)
+    # Continuidad
+    historial=[{"role": "user", "content": "Hola"}]  # Cargar conversación previa
 )
 ```
 
