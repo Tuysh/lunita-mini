@@ -6,15 +6,13 @@ ideal para aplicaciones web o cuando necesitas hacer varias cosas a la vez.
 
 from collections.abc import AsyncGenerator
 
-from groq.types.chat import ChatCompletionMessageParam
-
 from .cliente import nuevo_cliente_asincrono
 from .configuracion import ConfigurarEstrellas
-from .historial import Historial
+from .sesion_base import SesionBase
 from .utils import APIStatusError, ErroresMagicos
 
 
-class SesionAsincrona:
+class SesionAsincrona(SesionBase):
     """Crea y maneja una conversación asincrónica con Lunita.
 
     Usa esta clase cuando tu programa necesite hacer otras cosas mientras
@@ -54,11 +52,10 @@ class SesionAsincrona:
     """
 
     def __init__(self, configuracion: ConfigurarEstrellas):
-        self._configuracion = configuracion
-        self._historial: Historial = Historial(mensajes=configuracion.historial)
+        super().__init__(configuracion)
         self._cliente = nuevo_cliente_asincrono(self._configuracion.token)
 
-    async def predecir_en_vivo(self, entrada: str) -> AsyncGenerator[str, None]:
+    async def predecir(self, entrada: str) -> AsyncGenerator[str, None]:
         """Envía un mensaje a Lunita y espera su respuesta de forma asincrónica.
 
         Args:
@@ -71,7 +68,7 @@ class SesionAsincrona:
             RuntimeError: Si hubo un problema al conectarse o recibir la respuesta.
 
         Examples:
-            >>> async for fragmento in sesion.predecir_en_vivo("Dame un consejo"):
+            >>> async for fragmento in sesion.predecir("Dame un consejo"):
             ...     print(fragmento, end="")
         """
         try:
@@ -109,15 +106,3 @@ class SesionAsincrona:
             raise RuntimeError(
                 f"!Error desconocido¡ Ni lunita puede adivinar que fue: {e}"
             ) from e
-
-    @property
-    def historial(self) -> list[ChatCompletionMessageParam]:
-        """Obtiene todos los mensajes intercambiados en esta conversación.
-
-        Returns:
-            Lista con todos los mensajes (tuyos y de Lunita) en orden.
-
-        Examples:
-            >>> print(f"Total de mensajes: {len(sesion.historial)}")
-        """
-        return self._historial.historial

@@ -54,11 +54,14 @@ class ConfigurarEstrellas:
         modo: Literal["normal", "avanzado"] = "normal",
         historial: Optional[list[ChatCompletionMessageParam]] = None,
         instrucciones_adicionales: Optional[str] = None,
+        max_mensajes: int = 15,
+        temperatura: float = 1.1,
     ):
         self.token = token
-        self._temperatura = 1.1
+        self._temperatura = temperatura
         self._historial = historial.copy() if historial is not None else []
         self._instrucciones = instrucciones_adicionales
+        self._max_mensajes = max_mensajes
 
         self._modelo = (
             "openai/gpt-oss-120b" if modo == "avanzado" else "openai/gpt-oss-20b"
@@ -90,6 +93,15 @@ class ConfigurarEstrellas:
             Valor numérico de temperatura (mayor = más creativa).
         """
         return self._temperatura
+
+    @property
+    def max_mensajes(self) -> int:
+        """Obtiene el número máximo de mensajes en el historial.
+
+        Returns:
+            Número máximo de mensajes a mantener en el historial.
+        """
+        return self._max_mensajes
 
     def prompt(self) -> str:
         """Obtiene las instrucciones que definen la personalidad de Lunita.

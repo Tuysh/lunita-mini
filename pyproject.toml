@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lunita-mini"
-version = "0.2.1"
+version = "0.2.2"
 description = "¡Versión mini de Lunita!"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = ["groq>=1.0.0"]
 
-[dependency-groups]
+[project.optional-dependencies]
 test = ["pytest >= 9.0.2"]
 
 [project.urls]

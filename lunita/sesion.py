@@ -4,15 +4,13 @@ Este módulo permite crear conversaciones con Lunita de forma directa,
 esperando cada respuesta antes de continuar.
 """
 
-from groq.types.chat import ChatCompletionMessageParam
-
 from .cliente import nuevo_cliente
 from .configuracion import ConfigurarEstrellas
-from .historial import Historial
+from .sesion_base import SesionBase
 from .utils import APIStatusError, ErroresMagicos
 
 
-class Sesion:
+class Sesion(SesionBase):
     """Crea y maneja una conversación con Lunita.
 
     Usa esta clase cuando quieras hablar con Lunita de forma normal,
@@ -38,8 +36,7 @@ class Sesion:
     """
 
     def __init__(self, configuracion: ConfigurarEstrellas):
-        self._configuracion = configuracion
-        self._historial: Historial = Historial(mensajes=configuracion.historial)
+        super().__init__(configuracion)
         self._cliente = nuevo_cliente(self._configuracion.token)
 
     def predecir(self, entrada: str) -> str | None:
@@ -86,15 +83,3 @@ class Sesion:
             raise RuntimeError(
                 f"!Error desconocido¡ Ni lunita puede adivinar que fue: {e}"
             ) from e
-
-    @property
-    def historial(self) -> list[ChatCompletionMessageParam]:
-        """Obtiene todos los mensajes intercambiados en esta conversación.
-
-        Returns:
-            Lista con todos los mensajes (tuyos y de Lunita) en orden.
-
-        Examples:
-            >>> print(f"Total de mensajes: {len(sesion.historial)}")
-        """
-        return self._historial.historial
