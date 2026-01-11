@@ -1,0 +1,4 @@
+lunita-mini
+python-dotenv
+fastapi
+uvicorn
