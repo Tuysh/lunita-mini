@@ -39,7 +39,7 @@ print(f"🔮 Lunita: {respuesta}")
 ## Configuration
 
 ```python
-from lunita import ConfigurarEstrellas
+from lunita import ConfigurarEstrellas, Mensaje
 
 # Configuración básica
 config = ConfigurarEstrellas(
@@ -56,7 +56,7 @@ config = ConfigurarEstrellas(
     # Ajustes técnicos
     max_mensajes=20,            # Límite de memoria de conversación (default 15)
     temperatura=1.2,            # Creatividad: 0.0 a 2.0 (default 1.1)
-    # Continuidad
+    # Continuidad (Tipado opcional con Mensaje)
     historial=[{"role": "user", "content": "Hola"}]  # Cargar conversación previa
 )
 ```
