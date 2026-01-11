@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lunita-mini"
-version = "0.2.3"
+version = "0.2.4"
 description = "¡Versión mini de Lunita!"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,6 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Typing :: Typed",
 ]
 dependencies = ["groq>=1.0.0"]
 
@@ -25,3 +26,6 @@ test = ["pytest >= 9.0.2"]
 
 [tool.setuptools.packages.find]
 include = ["lunita*"]
+
+[tool.setuptools.package-data]
+lunita = ["py.typed"]
