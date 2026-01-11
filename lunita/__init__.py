@@ -1,5 +1,7 @@
+from groq.types.chat import ChatCompletionMessageParam as Mensaje
+
 from .configuracion import ConfigurarEstrellas
 from .sesion import Sesion
 from .sesion_asincrona import SesionAsincrona
 
-__all__ = ["Sesion", "SesionAsincrona", "ConfigurarEstrellas"]
+__all__ = ["Sesion", "SesionAsincrona", "ConfigurarEstrellas", "Mensaje"]
