@@ -27,7 +27,9 @@ class SesionBase(ABC):
     def __init__(self, configuracion: ConfigurarEstrellas) -> None:
         self._configuracion = configuracion
         self._historial = Historial(
-            mensajes=configuracion.historial, max_mensajes=configuracion.max_mensajes
+            mensajes=configuracion.historial,
+            max_mensajes=configuracion.max_mensajes,
+            token=configuracion.token,
         )
 
     @abstractmethod

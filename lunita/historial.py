@@ -4,9 +4,12 @@ Este módulo maneja la lista de mensajes intercambiados, manteniendo
 solo los más recientes para no sobrecargar la memoria.
 """
 
+from json import dumps
 from typing import Optional
 
 from groq.types.chat import ChatCompletionMessageParam
+
+from .constantes import PROMPT_RESUMEN
 
 
 class Historial:
@@ -24,6 +27,7 @@ class Historial:
         self,
         mensajes: Optional[list[ChatCompletionMessageParam]] = None,
         max_mensajes: int = 20,
+        token: Optional[str] = None,
     ):
         if mensajes is None:
             mensajes = []
@@ -32,6 +36,30 @@ class Historial:
             mensajes[-max_mensajes:] if len(mensajes) > max_mensajes else mensajes
         )
         self._max_mensajes = max_mensajes
+        self._token = token
+
+    def __resumir_historial(self) -> str:
+        from .cliente import nuevo_cliente
+
+        cliente = nuevo_cliente(self._token)
+        return (
+            cliente.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": PROMPT_RESUMEN,
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Resumen el siguiente historial de mensajes: {dumps(self._mensajes[0 : self._max_mensajes], indent=2)}",
+                    },
+                ],
+                temperature=0,
+            )
+            .choices[0]
+            .message.content
+        )
 
     @property
     def historial(self) -> list[ChatCompletionMessageParam]:
@@ -53,6 +81,17 @@ class Historial:
         """
         if len(valor) > self._max_mensajes:
             self._mensajes = valor[-self._max_mensajes :]
+            if self._token is not None:
+                self._mensajes.insert(
+                    0,
+                    {
+                        "role": "user",
+                        "content": f"<SYSTEM_NOTE>Contexto de la conversación: {self.__resumir_historial()}</SYSTEM_NOTE>",
+                    },
+                )
+                return
+
+            self._mensajes = valor[-self._max_mensajes :]
             return
 
         self._mensajes = valor
@@ -67,7 +106,15 @@ class Historial:
             *mensajes: Uno o más mensajes para agregar.
         """
         if len(self._mensajes) + len(mensajes) > self._max_mensajes:
-            exceso = len(self._mensajes) + len(mensajes) - self._max_mensajes
-            self._mensajes = self._mensajes[exceso:]
+            if self._token is not None:
+                self._mensajes = [
+                    {
+                        "role": "user",
+                        "content": f"<SYSTEM_NOTE>Contexto de la conversación: {self.__resumir_historial()}</SYSTEM_NOTE>",
+                    }
+                ]
+            else:
+                exceso = len(self._mensajes) + len(mensajes) - self._max_mensajes
+                self._mensajes = self._mensajes[exceso:]
 
         self._mensajes.extend(mensajes)
