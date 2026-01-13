@@ -18,6 +18,7 @@ class SesionBase(ABC):
 
     Esta clase abstracta define las funciones y propiedades que todas las
     sesiones deben tener, como el historial y la capacidad de predecir.
+    Inicializa el gestor de historial con la configuración proporcionada.
     No se usa directamente, sino como molde para otras clases.
 
     Args:

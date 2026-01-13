@@ -1,7 +1,7 @@
 """Constantes y textos fijos usados en Lunita.
 
 Este módulo contiene las instrucciones que definen cómo se comporta Lunita,
-su personalidad y sus reglas de conversación.
+su personalidad, sus reglas de conversación y los prompts de sistema.
 """
 
 PROMPT_LUNITA = """
