@@ -16,3 +16,4 @@ ejemplo_test.py
 # Productos compilados
 dist/
 lunita_mini.egg-info/
+build/
