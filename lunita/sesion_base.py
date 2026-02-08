@@ -30,7 +30,6 @@ class SesionBase(ABC):
         self._historial = Historial(
             mensajes=configuracion.historial,
             max_mensajes=configuracion.max_mensajes,
-            token=configuracion.token,
         )
 
     @abstractmethod
